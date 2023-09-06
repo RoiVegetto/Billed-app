@@ -140,28 +140,39 @@ export default class {
   };
 
   handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0;
-    if (this.index === undefined || this.index !== index) this.index = index;
-    if (this.counter % 2 === 0) {
-      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)' });
+    if (!this.states) {
+      this.states = {};
+    }
+
+    if (!this.states[index]) {
+      this.states[index] = {
+        isExpanded: false,
+        selectedBillId: null,
+      };
+    }
+
+    this.states[index].isExpanded = !this.states[index].isExpanded;
+
+    $(`#arrow-icon${index}`).css({
+      transform: this.states[index].isExpanded
+        ? 'rotate(0deg)'
+        : 'rotate(90deg)',
+    });
+
+    if (this.states[index].isExpanded) {
       const filteredAndSortedBills = filteredBills(
         bills,
-        getStatus(this.index)
+        getStatus(index)
       ).sort((a, b) => b.dateObject - a.dateObject);
-      $(`#status-bills-container${this.index}`).html(
-        cards(filteredAndSortedBills)
-      );
-      this.counter++;
+      $(`#status-bills-container${index}`).html(cards(filteredAndSortedBills));
     } else {
-      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)' });
-      $(`#status-bills-container${this.index}`).html('');
-      this.counter++;
+      $(`#status-bills-container${index}`).html('');
     }
 
     bills.forEach((bill) => {
-      $(`#open-bill${bill.id}`).on('click', (e) =>
-        this.handleEditTicket(e, bill, bills)
-      );
+      $(`#open-bill${bill.id}`)
+        .off('click')
+        .on('click', (e) => this.handleEditTicket(e, bill, bills));
     });
 
     return bills;

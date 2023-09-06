@@ -23,6 +23,7 @@ export default class NewBill {
     const errorMessage = this.document.querySelector('.error-message');
     const file = fileInput.files[0];
     const fileName = file.name;
+    // convertir en minuscule les informations png etc...
     const validfileExtensionRegex = /.+png$|.+jpeg$|.+jpg$/i;
 
     if (validfileExtensionRegex.test(fileName)) {
