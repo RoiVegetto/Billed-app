@@ -17,18 +17,21 @@ export default class NewBill {
     this.billId = null;
     new Logout({ document, localStorage, onNavigate });
   }
+
   handleChangeFile = (e) => {
     e.preventDefault();
     const fileInput = this.document.querySelector(`input[data-testid="file"]`);
-    const errorMessage = this.document.querySelector('.error-message');
+    const invalidMessage = this.document.querySelector('.invalid-form-control');
     const file = fileInput.files[0];
-    const fileName = file.name;
-    // convertir en minuscule les informations png etc...
     const validfileExtensionRegex = /.+png$|.+jpeg$|.+jpg$/i;
+    let fileName;
 
-    if (validfileExtensionRegex.test(fileName)) {
-      fileInput.classList.remove('invalid-form-control');
-      errorMessage.classList.add('hidden');
+    if (file) {
+      fileName = file.name.toLowerCase();
+    }
+
+    if (file && validfileExtensionRegex.test(fileName)) {
+      invalidMessage.style.visibility = 'hidden';
 
       const formData = new FormData();
       const email = JSON.parse(localStorage.getItem('user')).email;
@@ -51,17 +54,19 @@ export default class NewBill {
         })
         .catch((e) => console.log(e));
     } else {
-      fileInput.classList.add('invalid-form-control');
-      errorMessage.classList.remove('hidden');
-      fileInput.value = null;
+      invalidMessage.style.visibility = 'visible';
     }
   };
+
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log(
-      'e.target.querySelector(`input[data-testid="datepicker"]`).value',
-      e.target.querySelector(`input[data-testid="datepicker"]`).value
-    );
+
+    if (!this.fileValid) {
+      const errorMessage = this.document.querySelector('.error-message');
+      errorMessage.style.visibility = 'visible';
+      return;
+    }
+
     const email = JSON.parse(localStorage.getItem('user')).email;
     const bill = {
       email,

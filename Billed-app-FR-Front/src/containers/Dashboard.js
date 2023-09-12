@@ -97,6 +97,8 @@ export default class {
   handleEditTicket(e, bill, bills) {
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
+    console.log('bill.id', bill.id);
+    console.log('counter', this.counter);
     if (this.counter % 2 === 0) {
       bills.forEach((b) => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' });
@@ -140,39 +142,24 @@ export default class {
   };
 
   handleShowTickets(e, bills, index) {
-    if (!this.states) {
-      this.states = {};
-    }
-
-    if (!this.states[index]) {
-      this.states[index] = {
-        isExpanded: false,
-        selectedBillId: null,
-      };
-    }
-
-    this.states[index].isExpanded = !this.states[index].isExpanded;
-
-    $(`#arrow-icon${index}`).css({
-      transform: this.states[index].isExpanded
-        ? 'rotate(0deg)'
-        : 'rotate(90deg)',
-    });
-
-    if (this.states[index].isExpanded) {
-      const filteredAndSortedBills = filteredBills(
-        bills,
-        getStatus(index)
-      ).sort((a, b) => b.dateObject - a.dateObject);
-      $(`#status-bills-container${index}`).html(cards(filteredAndSortedBills));
+    if (this.counter === undefined || this.index !== index) this.counter = 0;
+    if (this.index === undefined || this.index !== index) this.index = index;
+    if (this.counter % 2 === 0) {
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)' });
+      $(`#status-bills-container${this.index}`).html(
+        cards(filteredBills(bills, getStatus(this.index)))
+      );
+      this.counter++;
     } else {
-      $(`#status-bills-container${index}`).html('');
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)' });
+      $(`#status-bills-container${this.index}`).html('');
+      this.counter++;
     }
 
     bills.forEach((bill) => {
       $(`#open-bill${bill.id}`)
         .off('click')
-        .on('click', (e) => this.handleEditTicket(e, bill, bills));
+        .click((e) => this.handleEditTicket(e, bill, bills));
     });
 
     return bills;
