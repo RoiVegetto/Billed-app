@@ -7,6 +7,7 @@ import BillsUI from '../views/BillsUI.js';
 import { bills } from '../fixtures/bills.js';
 import { ROUTES_PATH } from '../constants/routes.js';
 import { localStorageMock } from '../__mocks__/localStorage.js';
+import Bills from '../containers/Bills.js';
 
 import router from '../app/Router.js';
 
@@ -42,6 +43,25 @@ describe('Given I am connected as an employee', () => {
       const antiChrono = (a, b) => (a < b ? 1 : -1);
       const datesSorted = [...dates].sort(antiChrono);
       expect(dates).toEqual(datesSorted);
+    });
+
+    describe('When i create a bills object', () => {
+      test('Then i can click on the new bills', () => {
+        document.body.innerHTML = `<button type="button" data-testid='btn-new-bill' class="btn btn-primary">
+      Nouvelle note de frais</button>`;
+        let testBills = new Bills({
+          document: document,
+          onNavigate: null,
+          firestore: null,
+          localStorage: null,
+        });
+        testBills.onNavigate = jest.fn();
+        const buttonNewBill = document.querySelector(
+          `button[data-testid="btn-new-bill"]`
+        );
+        buttonNewBill.click();
+        expect(testBills.onNavigate).toHaveBeenCalled();
+      });
     });
   });
 });
