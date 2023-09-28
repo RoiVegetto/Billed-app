@@ -2,12 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { screen, waitFor } from '@testing-library/dom';
+import { screen, waitFor, fireEvent } from '@testing-library/dom';
 import BillsUI from '../views/BillsUI.js';
 import { bills } from '../fixtures/bills.js';
 import { ROUTES_PATH } from '../constants/routes.js';
 import { localStorageMock } from '../__mocks__/localStorage.js';
 import Bills from '../containers/Bills.js';
+import { ROUTES } from '../constants/routes.js';
+import mockedStore from '../__mocks__/store';
 
 import router from '../app/Router.js';
 
@@ -61,6 +63,107 @@ describe('Given I am connected as an employee', () => {
         );
         buttonNewBill.click();
         expect(testBills.onNavigate).toHaveBeenCalled();
+      });
+    });
+
+    describe('When i am on the bills page and i click on the eye icon button', () => {
+      test('then a modal should open', () => {
+        const html = BillsUI({ data: bills });
+        document.body.innerHTML = html;
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        const bill = new Bills({
+          document,
+          onNavigate,
+          store: null,
+          localStorage: window.localStorage,
+        });
+        $.fn.modal = jest.fn();
+        const button = screen.getAllByTestId('icon-eye')[0];
+        const handleClickIconEye = jest.fn((e) => {
+          e.preventDefault();
+          bill.handleClickIconEye(button);
+        });
+        button.addEventListener('click', handleClickIconEye);
+        fireEvent.click(button);
+
+        expect(handleClickIconEye).toHaveBeenCalled();
+      });
+    });
+
+    describe('When i am on the bills page and i click on the make new Bill Button', () => {
+      test('a new bill modal should open', () => {
+        Object.defineProperty(window, 'localStorage', {
+          value: localStorageMock,
+        });
+        window.localStorage.setItem(
+          'user',
+          JSON.stringify({
+            type: 'Employee',
+          })
+        );
+
+        const html = BillsUI({ data: [] });
+        document.body.innerHTML = html;
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        const bills = new Bills({
+          document,
+          onNavigate,
+          firestore: null,
+          localStorage: window.localStorage,
+        });
+        const button = screen.getByTestId('btn-new-bill');
+        const handleClickNewBill = jest.fn((e) => bills.handleClickNewBill(e));
+        button.click('click', handleClickNewBill);
+        fireEvent.click(button);
+        expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy();
+      });
+    });
+    describe('When an error occurs on API', () => {
+      beforeEach(() => {
+        jest.spyOn(mockedStore, 'bills');
+        Object.defineProperty(window, 'localStorage', {
+          value: localStorageMock,
+        });
+        window.localStorage.setItem(
+          'user',
+          JSON.stringify({
+            type: 'Employee',
+            email: 'a@a',
+          })
+        );
+        const root = document.createElement('div');
+        root.setAttribute('id', 'root');
+        document.body.appendChild(root);
+        router();
+      });
+      test('fetches bills from an API and fails with 404 message error', async () => {
+        mockedStore.bills.mockImplementationOnce(() => {
+          return {
+            list: () => {
+              return Promise.reject(new Error('Erreur 404'));
+            },
+          };
+        });
+        document.body.innerHTML = BillsUI({ error: 'Erreur 404' });
+        const message = screen.getByText(/Erreur 404/);
+        expect(message).toBeTruthy();
+      });
+
+      test('fetches bills from an API and fails with 500 message error', async () => {
+        mockedStore.bills.mockImplementationOnce(() => {
+          return {
+            list: () => {
+              return Promise.reject(new Error('Erreur 500'));
+            },
+          };
+        });
+        document.body.innerHTML = BillsUI({ error: 'Erreur 500' });
+        const message = screen.getByText(/Erreur 500/);
+        expect(message).toBeTruthy();
       });
     });
   });
