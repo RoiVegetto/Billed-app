@@ -64,24 +64,28 @@ describe('When I am on NewBill Page', () => {
   });
 });
 
+describe('When I have filled in the form correctly and I clicked on submit button', () => {
+  test('Then Bills page should be rendered', () => {
+    const newBill = new NewBill({
+      document,
+      onNavigate,
+      store: null,
+      localStorage: window.localStorage,
+    });
+
+    const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
+
+    const formNewBill = screen.getByTestId('form-new-bill');
+    formNewBill.addEventListener('submit', handleSubmit);
+
+    fireEvent.submit(formNewBill);
+
+    expect(handleSubmit).toHaveBeenCalled();
+  });
+});
+
 /* Api */
 describe('When I am on NewBill Page and submit the form', () => {
-  beforeEach(() => {
-    jest.spyOn(mockStore, 'bills');
-    Object.defineProperty(window, 'localStorage', { value: localStorageMock });
-    window.localStorage.setItem(
-      'user',
-      JSON.stringify({
-        type: 'Employee',
-        email: 'a@a',
-      })
-    );
-    const root = document.createElement('div');
-    root.setAttribute('id', 'root');
-    document.body.appendChild(root);
-    router();
-  });
-
   describe('When an error occurs on API', () => {
     beforeEach(() => {
       jest.spyOn(mockStore, 'bills');
@@ -108,7 +112,7 @@ describe('When I am on NewBill Page and submit the form', () => {
           },
         };
       });
-      window.onNavigate(ROUTES_PATH.NewBill);
+      window.onNavigate(ROUTES_PATH.Bills);
       await new Promise(process.nextTick);
       const message = await screen.getByText(/Erreur 404/);
       expect(message).toBeTruthy();
@@ -123,7 +127,7 @@ describe('When I am on NewBill Page and submit the form', () => {
         };
       });
 
-      window.onNavigate(ROUTES_PATH.NewBill);
+      window.onNavigate(ROUTES_PATH.Bills);
       await new Promise(process.nextTick);
       const message = await screen.getByText(/Erreur 500/);
       expect(message).toBeTruthy();
