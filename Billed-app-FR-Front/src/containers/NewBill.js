@@ -32,6 +32,7 @@ export default class NewBill {
 
     if (file && validfileExtensionRegex.test(fileName)) {
       invalidMessage.style.visibility = 'hidden';
+      this.fileValid = true;
 
       const formData = new FormData();
       const email = JSON.parse(localStorage.getItem('user')).email;
@@ -55,6 +56,7 @@ export default class NewBill {
         .catch((e) => console.log(e));
     } else {
       invalidMessage.style.visibility = 'visible';
+      this.fileValid = false;
     }
   };
 

@@ -3,13 +3,12 @@
  */
 
 import '@testing-library/jest-dom';
-import { screen, fireEvent, getByTestId, waitFor } from '@testing-library/dom';
+import { screen, fireEvent, waitFor } from '@testing-library/dom';
 import mockStore from '../__mocks__/store.js';
 import NewBill from '../containers/NewBill.js';
-import { ROUTES, ROUTES_PATH } from '../constants/routes.js';
+import { ROUTES_PATH } from '../constants/routes.js';
 import { localStorageMock } from '../__mocks__/localStorage.js';
 import router from '../app/Router.js';
-import Bills from '../containers/Bills.js';
 
 jest.mock('../app/Store', () => mockStore);
 
@@ -72,7 +71,7 @@ describe('When I have filled in the form correctly and I clicked on submit butto
       store: null,
       localStorage: window.localStorage,
     });
-
+    newBill.fileValid = true;
     const handleSubmit = jest.fn((e) => newBill.handleSubmit(e));
 
     const formNewBill = screen.getByTestId('form-new-bill');
