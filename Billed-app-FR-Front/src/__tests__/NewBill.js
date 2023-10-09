@@ -35,7 +35,7 @@ describe('When I am on NewBill Page', () => {
   });
 
   describe('When I am on NewBill form', () => {
-    test('Then I add File', async () => {
+    test('Then I add File succes', async () => {
       const dashboard = new NewBill({
         document,
         onNavigate,
@@ -61,7 +61,38 @@ describe('When I am on NewBill Page', () => {
       expect(screen.getByText('Envoyer une note de frais')).toBeTruthy();
     });
   });
+
+  describe('When I am on NewBill form', () => {
+    test('Then I add File not succes', async () => {
+      const dashboard = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: localStorageMock,
+      });
+
+      const handleChangeFile = jest.fn(dashboard.handleChangeFile);
+      const inputFile = screen.getByTestId('file');
+      const errorType = screen.getByTestId('error-type');
+      inputFile.addEventListener('change', handleChangeFile);
+      fireEvent.change(inputFile, {
+        target: {
+          files: [
+            new File(['document.gif'], 'document.gif', {
+              type: 'document/gif',
+            }),
+          ],
+        },
+      });
+
+      expect(handleChangeFile).toHaveBeenCalled();
+      expect(handleChangeFile).toBeCalled();
+      expect(errorType).toBeVisible();
+    });
+  });
 });
+
+// Rajouter un test pour les tests négatif d'un fichier mauvais
 
 describe('When I have filled in the form correctly and I clicked on submit button', () => {
   test('Then Bills page should be rendered', () => {

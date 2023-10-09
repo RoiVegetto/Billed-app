@@ -55,7 +55,7 @@ export default () => {
                   <div class="col-half">
                   <label for="file" class="bold-label">Justificatif</label>
                   <input type="file" class="form-control blue-border" data-testid="file" />
-                  <div class="invalid-form-control" style="visibility: hidden;">Le fichier est invalide, veuillez uploader un fichier avec une extension .png .jpeg ou .jpg</div>
+                  <div class="invalid-form-control" data-testid="error-type" style="visibility: hidden;">Le fichier est invalide, veuillez uploader un fichier avec une extension .png .jpeg ou .jpg</div>
                   <div class="error-message" style="visibility: hidden;">Certains champs ne sont pas correctement remplis</div>
                   </div>
                 </div>
