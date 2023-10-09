@@ -92,8 +92,6 @@ describe('When I am on NewBill Page', () => {
   });
 });
 
-// Rajouter un test pour les tests négatif d'un fichier mauvais
-
 describe('When I have filled in the form correctly and I clicked on submit button', () => {
   test('Then Bills page should be rendered', () => {
     const newBill = new NewBill({
